@@ -32,7 +32,7 @@ Ainda sem lógica de negócio.
 Requisitos: [.NET SDK 10.0](https://dotnet.microsoft.com/download) ou superior.
 
 ```bash
-git clone https://github.com/<utilizador>/mini-crm.git
+git clone https://github.com/gustavomendo/mini-crm.git
 cd mini-crm
 dotnet run --project src/MiniCrm.ConsoleApp
 ```
