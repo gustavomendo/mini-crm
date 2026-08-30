@@ -22,7 +22,7 @@ internal class Cliente
 
     public override string ToString()
     {
-        return $"ID: {Id}\nNome: {Nome}\nEmail: {Email}\nData de Registo: {DataRegisto}\n";
+        return $"Nome: {Nome} | Email: {Email} | Data de Registo: {DataRegisto}";
 
     }
 }
