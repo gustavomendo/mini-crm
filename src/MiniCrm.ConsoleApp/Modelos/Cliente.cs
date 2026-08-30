@@ -25,4 +25,5 @@ internal class Cliente
         return $"Nome: {Nome} | Email: {Email} | Data de Registo: {DataRegisto}";
 
     }
+
 }
