@@ -1,4 +1,5 @@
 using MiniCrm.ConsoleApp.Modelos;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 List<Cliente> lista = new()
 {
@@ -31,6 +32,9 @@ do
     Console.WriteLine("=== MINI CRM ===");
     Console.WriteLine("1. Listar Clientes");
     Console.WriteLine("2. Adicionar Cliente");
+    Console.WriteLine("3. Procurar Cliente por Nome");
+    Console.WriteLine("4. Remover Cliente");
+    Console.WriteLine("5. Procurar Cliente por Id");
     Console.WriteLine("0. Sair");
     Console.Write("\nEscolhe uma opção: ");
 
@@ -47,6 +51,21 @@ do
         case "2":
             Console.WriteLine("\n[A adicionar um novo cliente...]\n");
             CriarCliente();
+            break;
+
+        case "3":
+            Console.WriteLine("\n[A procurar o cliente...]\n");
+            ProcurarCliente();
+            Thread.Sleep(500);
+            break;
+
+        case "4":
+            Console.WriteLine("\n[A remover o cliente...]\n");
+            RemoverCliente();
+            Thread.Sleep(500);
+            break;
+        case "5":
+            ProcurarClientePorId();
             break;
 
         case "0":
@@ -75,13 +94,13 @@ void MostrarClientes()
     }
     else
     {
-        string cabecalho = $"{"#",-3} | {"Nome",-20} | {"Email",-27} | {"Data Registo",-12}";
+        string cabecalho = $"{"#",-3} | {"Id",-8} | {"Nome",-20} | {"Email",-27} | {"Data Registo",-12}";
         Console.WriteLine(cabecalho);
         Console.WriteLine(new string('-', cabecalho.Length)); // Linha separadora
 
         foreach (Cliente cliente in lista)
         {
-            Console.WriteLine($"{contador,-3} | {cliente.Nome,-20} | {cliente.Email,-27} | {cliente.DataRegisto,-12}");
+            Console.WriteLine($"{contador,-3} | {cliente.Id.ToString()[..8],-8} | {cliente.Nome,-20} | {cliente.Email,-27} | {cliente.DataRegisto,-12}");
             contador++;
         }
     }
@@ -118,15 +137,7 @@ void CriarCliente()
             continue;
         }
 
-        bool jaExiste = false;
-        foreach (Cliente clienteExistente in lista)
-        {
-            if (string.Equals(clienteExistente.Email, email, StringComparison.OrdinalIgnoreCase))
-            {
-                jaExiste = true;
-                break;
-            }
-        }
+        bool jaExiste = lista.Any(c => string.Equals(c.Email, email, StringComparison.OrdinalIgnoreCase));
 
         if (jaExiste)
         {
@@ -143,4 +154,91 @@ void CriarCliente()
     lista.Add(cliente);
 
     Console.WriteLine($"\nCliente \"{cliente.Nome}\" adicionado com sucesso.");
+}
+
+
+void ProcurarCliente()
+{
+    Console.Write("Indique o nome do Cliente: ");
+    string nome = Console.ReadLine() ?? "";
+
+    List<Cliente> encontrados = lista
+        .Where(c => c.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    if (encontrados.Count == 0)
+    {
+        Console.WriteLine("Cliente não encontrado");
+        return;
+    }
+
+    foreach (Cliente cliente in encontrados)
+    {
+        Console.WriteLine(cliente);
+    }
+
+    Console.WriteLine($"Foram encontrados: {encontrados.Count}");
+}
+
+void RemoverCliente()
+{
+    if (lista.Count == 0)
+    {
+        Console.WriteLine("Não existem clientes para remover.");
+        return;
+    }
+
+    MostrarClientes();
+
+    Console.Write("Indique o número do cliente a remover: ");
+    string numeroEscrito = Console.ReadLine() ?? "";
+
+    if (!int.TryParse(numeroEscrito, out int numeroCliente))
+    {
+        Console.WriteLine("Tem de indicar um número.");
+        return;
+    }
+
+    if (numeroCliente < 1 || numeroCliente > lista.Count)
+    {
+        Console.WriteLine("Não existe nenhum cliente com esse número.");
+        return;
+    }
+
+    Cliente cliente = lista[numeroCliente - 1];
+
+    Console.Write($"Vai remover: {cliente.Nome}. Tem a certeza? (s/n): ");
+    string confirmacao = Console.ReadLine() ?? "";
+
+    if (confirmacao.Equals("s", StringComparison.OrdinalIgnoreCase))
+    {
+        lista.RemoveAt(numeroCliente - 1);
+        Console.WriteLine($"Cliente \"{cliente.Nome}\" removido com sucesso.");
+    }
+    else
+    {
+        Console.WriteLine("Remoção cancelada.");
+    }
+}
+
+void ProcurarClientePorId()
+{
+    Console.Write("Indique o Id do cliente: ");
+    string idEscrito = Console.ReadLine() ?? "";
+
+    if (!Guid.TryParse(idEscrito, out Guid idProcurado))
+    {
+        Console.WriteLine("Isso não é um Id válido.");
+        return;
+    }
+
+    Cliente? encontrado = lista.FirstOrDefault(c => c.Id == idProcurado);
+
+    if (encontrado == null)
+    {
+        Console.WriteLine("Não existe nenhum cliente com esse Id.");
+        return;
+    }
+
+    Console.WriteLine(encontrado);
 }
