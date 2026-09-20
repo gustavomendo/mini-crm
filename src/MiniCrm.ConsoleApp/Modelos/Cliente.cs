@@ -7,7 +7,6 @@ internal class Cliente
     public string Email { get; set; }
     public DateOnly DataRegisto { get; }
 
-    //Construtor
     public Cliente(string nome, string email, DateOnly dataRegisto)
     {
         if (string.IsNullOrWhiteSpace(nome))
