@@ -28,7 +28,7 @@ List<Cliente> lista = new()
 string opcao;
 do
 {
-    Console.Clear(); // Limpa a consola para o menu ficar limpo
+    Console.Clear();
     Console.WriteLine("=== MINI CRM ===");
     Console.WriteLine("1. Listar Clientes");
     Console.WriteLine("2. Adicionar Cliente");
@@ -100,7 +100,7 @@ void MostrarClientes()
 
         foreach (Cliente cliente in lista)
         {
-            Console.WriteLine($"{contador,-3} | {cliente.Id.ToString()[..8],-8} | {cliente.Nome,-20} | {cliente.Email,-27} | {cliente.DataRegisto,-12}");
+            Console.WriteLine($"{contador,-3} | {cliente.Id.ToString().Substring(0, 8),-8} | {cliente.Nome,-20} | {cliente.Email,-27} | {cliente.DataRegisto,-12}");
             contador++;
         }
     }
@@ -226,19 +226,27 @@ void ProcurarClientePorId()
     Console.Write("Indique o Id do cliente: ");
     string idEscrito = Console.ReadLine() ?? "";
 
-    if (!Guid.TryParse(idEscrito, out Guid idProcurado))
+    if (string.IsNullOrWhiteSpace(idEscrito))
     {
-        Console.WriteLine("Isso não é um Id válido.");
+        Console.WriteLine("Tem de indicar um Id.");
         return;
     }
 
-    Cliente? encontrado = lista.FirstOrDefault(c => c.Id == idProcurado);
+    List<Cliente> encontrados = lista
+        .Where(c => c.Id.ToString().StartsWith(idEscrito, StringComparison.OrdinalIgnoreCase))
+        .ToList();
 
-    if (encontrado == null)
+    if (encontrados.Count == 0)
     {
         Console.WriteLine("Não existe nenhum cliente com esse Id.");
         return;
     }
 
-    Console.WriteLine(encontrado);
+    if (encontrados.Count > 1)
+    {
+        Console.WriteLine($"Esse início de Id corresponde a {encontrados.Count} clientes. Escreva mais caracteres.");
+        return;
+    }
+
+    Console.WriteLine(encontrados[0]);
 }
